@@ -20,3 +20,8 @@ Tweets the markov chains made from tweets
 5. markovprinter.py
 Runs the script, like it will be run in tweeter.py but does not post it to twitter
 
+### Requirments
+
++ Python3
++ Tweepy
++ A twitter account with the API details saved
