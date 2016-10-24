@@ -1,7 +1,7 @@
 # Ebooker
 Allows anyone to make their own Horse Ebooks clone easily!
 
-## How To use
+## How To Use
 
 The repo consists of 5 main files. This let's you scrape tweets, pickle them, test them, then print them on twitter.
 
@@ -20,7 +20,7 @@ Tweets the markov chains made from tweets
 5. markovprinter.py
 Runs the script, like it will be run in tweeter.py but does not post it to twitter
 
-For this code to run the API details must be added to apiconfig.py and the username set in scraper.py must be changed to the targetted user:
+For this code to run the API details must be added to apiconfig.py and the username set in scraper.py must be changed to the targeted user:
 
 ```python
 for status in limithandler(tweepy.Cursor(api.user_timeline, screen_name="#PutUsernameHere").items()):
