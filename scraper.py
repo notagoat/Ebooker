@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import tweepy, time, re
+import tweepy, time, re, sys
 import apiconfig
 
 t = open('Tweets.txt', 'w') #Default file name
@@ -12,13 +12,28 @@ def limithandler(cursor): #Handles limits and pagination
             print("Limit hit. Sleeping")
             time.sleep(60)
 
-def scraper(api):
+def scraper():
     i = 0 #Counts loops to print status
-    c = 0 #Counts times of loop
+    api = get_api()
+    namecheck = False
+
+    while namecheck == False:
+        name = input("Name for Scraping: ")
+        try:
+            check = api.get_user(id = name)
+            print("Name: " + check.name)
+            print("Tweet Count: %d "% check.statuses_count)
+            print("\n")
+            namecheck = True
+        except Exception as e:
+            print("Name is not valid. Please retry.")
+            pass
+
     RTcheck = re.compile('.*RT @.*') #Removes RT's
     Usercheck = re.compile('\s*\.?(@\w*):?') #Removes @names
     Linkcheck = re.compile('(https?:\/\/.* )') #Removes Links (http or https)
-    for status in limithandler(tweepy.Cursor(api.user_timeline, screen_name="realDonaldTrump").items()):
+    for status in limithandler(tweepy.Cursor(api.user_timeline, screen_name=name).items()):
+    #TODO: Add check for valid name else fail (loop and var?)
         tweet = status.text #Gets the text
         tweet = "BEGIN NOW " + tweet + " END" # Forms it for the markov
         tweet = tweet.replace('\n', ' ') #Removes New lines from tweets
@@ -27,15 +42,13 @@ def scraper(api):
         tweet = Usercheck.sub('',tweet)
         tweet = Linkcheck.sub('',tweet)
 
-        if tweet == "\n" or "":
-            break #Removes blanks
-        t.write("\n"+tweet) #Writes to file
-        i += 1
-        if i > 100: #Checks status and shows it's still running
-            c +=1
-            print("%d: Scraping..."% c)
-            i = 0
-
+        if tweet != "\n" or "":
+            t.write("\n"+tweet) #Writes to file
+            i += 1
+            if i % 100 == 0: #Checks status and shows it's still running
+                temp = i / 100
+                print("%d : Scraping..." % temp )
+    print("\n%d Tweet's scraped." %i)
 def get_api():
     #Handles API requests
     auth = tweepy.OAuthHandler(apiconfig.cfg['consumer_key'], apiconfig.cfg['consumer_secret'])
@@ -43,8 +56,7 @@ def get_api():
     return tweepy.API(auth)
 
 def main():
-    api = get_api()
-    scraper(api)
+    scraper()
 
 if __name__ == "__main__":
     main()
