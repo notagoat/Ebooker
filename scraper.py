@@ -32,23 +32,28 @@ def scraper():
     RTcheck = re.compile('.*RT @.*') #Removes RT's
     Usercheck = re.compile('\s*\.?(@\w*):?') #Removes @names
     Linkcheck = re.compile('(https?:\/\/.* )') #Removes Links (http or https)
+
     for status in limithandler(tweepy.Cursor(api.user_timeline, screen_name=name).items()):
-    #TODO: Add check for valid name else fail (loop and var?)
         tweet = status.text #Gets the text
         tweet = "BEGIN NOW " + tweet + " END" # Forms it for the markov
+
         tweet = tweet.replace('\n', ' ') #Removes New lines from tweets
+        tweet = tweet.replace('&lt;', '<') #Greater and Less than checks
+        tweet = tweet.replace('&gt;', '>')
+
         #Run regex checks
         tweet = RTcheck.sub('',tweet)
         tweet = Usercheck.sub('',tweet)
         tweet = Linkcheck.sub('',tweet)
-
-        if tweet != "\n" or "":
-            t.write("\n"+tweet) #Writes to file
-            i += 1
-            if i % 100 == 0: #Checks status and shows it's still running
-                temp = i / 100
-                print("%d : Scraping..." % temp )
+        if tweet != "":
+            if tweet != "BEGIN NOW END":
+                t.write(tweet+"\n") #Writes to file
+                i += 1
+                if i % 100 == 0: #Checks status and shows it's still running
+                    temp = i / 100
+                    print("%d : Scraping..." %temp )
     print("\n%d Tweet's scraped." %i)
+
 def get_api():
     #Handles API requests
     auth = tweepy.OAuthHandler(apiconfig.cfg['consumer_key'], apiconfig.cfg['consumer_secret'])
