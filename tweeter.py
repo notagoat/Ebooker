@@ -40,8 +40,11 @@ def main():
     api = get_api()
     while True:
         fintweet = markov()
-        api.update_status(status=fintweet)
+        try:
+            api.update_status(status=fintweet)
+        except:
+            pass
         time.sleep(3600)
-
+        
 if __name__ == "__main__":
     main()
